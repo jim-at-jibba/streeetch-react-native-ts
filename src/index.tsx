@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  SafeAreaView
+} from 'react-native'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -11,15 +18,48 @@ const instructions = Platform.select({
 interface Props {
   text: string
 }
-export default class App extends React.Component<Props> {
+
+interface State {
+  times: number[]
+  selectedTime?: number
+}
+export default class App extends React.Component<Props, State> {
+  public state = {
+    times: [10, 15, 20, 25, 30, 45, 60]
+  }
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.tsx</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <SafeAreaView>
+          <View style={styles.scrollViewWrapper}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              decelerationRate={0}
+              snapToAlignment={'center'}
+              snapToInterval={200}
+              onMomentumScrollEnd={e =>
+                this.setTimerValue(e.nativeEvent.contentOffset.x)
+              }
+            >
+              {this.state.times.map(time => (
+                <View key={time} style={styles.textWrapper}>
+                  <Text style={styles.text}>{time}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </View>
     )
+  }
+
+  private setTimerValue = (scrollPosition: number): void => {
+    console.log('ScrollPosition', scrollPosition)
+    // text width = 200 / 100 / 2 gives us index
+    const index = scrollPosition / 100 / 2
+    console.log('Index', index, this.state.times[index])
+    this.setState({ selectedTime: this.state.times[index] })
   }
 }
 
@@ -30,14 +70,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10
+  scrollViewWrapper: {
+    width: 200
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5
+  text: {
+    fontSize: 150
+  },
+  textWrapper: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 200
   }
 })
