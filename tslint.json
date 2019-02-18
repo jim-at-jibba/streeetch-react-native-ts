@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-react",
+    "tslint-config-prettier",
+    "tslint-config-standard"
+  ],
+  "linterOptions": {
+    "exclude": ["node_modules/**/*.ts", "templates"]
+  },
+  "rules": {
+    "ordered-imports": false,
+    "member-ordering": false,
+    "interface-name": [true, "never-prefix"],
+    "no-empty": false,
+    "object-literal-sort-keys": false,
+    "no-reference": false,
+    "array-type": false,
+    "no-string-literal": false,
+    "jsdoc-format": true,
+    "max-classes-per-file": false,
+    "no-console": false,
+    "jsx-no-lambda": false
+  }
+}
