@@ -5,7 +5,8 @@ import {
   Text,
   View,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
+  TouchableHighlight
 } from 'react-native'
 
 const instructions = Platform.select({
@@ -49,6 +50,23 @@ export default class App extends React.Component<Props, State> {
               ))}
             </ScrollView>
           </View>
+          <View style={styles.buttonWrapper}>
+            <View style={styles.button}>
+              <TouchableHighlight>
+                <Text>Start</Text>
+              </TouchableHighlight>
+            </View>
+            <View style={styles.button}>
+              <TouchableHighlight>
+                <Text>Start</Text>
+              </TouchableHighlight>
+            </View>
+            <View style={styles.button}>
+              <TouchableHighlight>
+                <Text>Start</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
         </SafeAreaView>
       </View>
     )
@@ -71,6 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF'
   },
   scrollViewWrapper: {
+    flex: 4,
     width: 200
   },
   text: {
@@ -81,5 +100,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: 200
+  },
+  buttonWrapper: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  button: {
+    flex: 1,
+    justifyContent: 'space-between'
   }
 })
