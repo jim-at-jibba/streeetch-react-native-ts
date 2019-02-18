@@ -1,0 +1,3 @@
+rootProject.name = 'streeetch'
+
+include ':app'
