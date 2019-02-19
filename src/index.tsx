@@ -9,76 +9,63 @@ import {
   TouchableHighlight
 } from 'react-native'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu'
-})
-
-interface Props {
-  text: string
-}
-
 interface State {
   times: number[]
-  selectedTime?: number
 }
-export default class App extends React.Component<Props, State> {
-  public state = {
-    times: [10, 15, 20, 25, 30, 45, 60]
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-        <SafeAreaView>
-          <View style={styles.scrollViewWrapper}>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              decelerationRate={0}
-              snapToAlignment={'center'}
-              snapToInterval={200}
-              onMomentumScrollEnd={e =>
-                this.setTimerValue(e.nativeEvent.contentOffset.x)
-              }
-            >
-              {this.state.times.map(time => (
-                <View key={time} style={styles.textWrapper}>
-                  <Text style={styles.text}>{time}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-          <View style={styles.buttonWrapper}>
-            <View style={styles.button}>
-              <TouchableHighlight>
-                <Text>Start</Text>
-              </TouchableHighlight>
-            </View>
-            <View style={styles.button}>
-              <TouchableHighlight>
-                <Text>Start</Text>
-              </TouchableHighlight>
-            </View>
-            <View style={styles.button}>
-              <TouchableHighlight>
-                <Text>Start</Text>
-              </TouchableHighlight>
-            </View>
-          </View>
-        </SafeAreaView>
-      </View>
-    )
-  }
 
-  private setTimerValue = (scrollPosition: number): void => {
-    console.log('ScrollPosition', scrollPosition)
-    // text width = 200 / 100 / 2 gives us index
-    const index = scrollPosition / 100 / 2
-    console.log('Index', index, this.state.times[index])
-    this.setState({ selectedTime: this.state.times[index] })
+const initialState: State = {
+  times: [10, 15, 20, 25, 30, 45, 60]
+}
+
+const reducer: React.Reducer<State, actions> = (state, action) => {
+  switch (action.type) {
+    case 'what':
+      return { ...state }
+    default:
+      return state
   }
+}
+const App = props => {
+  const [state, dispatch] = React.useReducer(reducer, initialState)
+  return (
+    <View style={styles.container}>
+      <SafeAreaView>
+        <View style={styles.scrollViewWrapper}>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            decelerationRate={0}
+            snapToAlignment={'center'}
+            snapToInterval={200}
+            onMomentumScrollEnd={e => console.log('WHAT')}
+          >
+            {state.times.map(time => (
+              <View key={time} style={styles.textWrapper}>
+                <Text style={styles.text}>{time}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+        <View style={styles.buttonWrapper}>
+          <View style={styles.button}>
+            <TouchableHighlight>
+              <Text>Start</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.button}>
+            <TouchableHighlight>
+              <Text>Start</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.button}>
+            <TouchableHighlight>
+              <Text>Start</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </SafeAreaView>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -110,3 +97,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   }
 })
+
+export default App
