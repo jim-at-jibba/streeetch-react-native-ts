@@ -23,17 +23,27 @@ interface Props {
 interface State {
   times: number[]
   selectedTime?: number
+  selectedIndex?: number
 }
 export default class App extends React.Component<Props, State> {
+  private scroll = React.createRef()
   public state = {
-    times: [10, 15, 20, 25, 30, 45, 60]
+    times: [10, 15, 20, 25, 30, 45, 60],
+    selectedIndex: 0
   }
+
   render() {
     return (
       <View style={styles.container}>
-        <SafeAreaView>
-          <View style={styles.scrollViewWrapper}>
+        <View style={styles.scrollViewWrapper}>
+          <View style={styles.scrollButton}>
+            <TouchableHighlight onPress={() => this.moveTo('prev')}>
+              <Text style={styles.scrollButtonText}>Prev</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={{ width: 200 }}>
             <ScrollView
+              ref={this.scroll}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               decelerationRate={0}
@@ -50,34 +60,52 @@ export default class App extends React.Component<Props, State> {
               ))}
             </ScrollView>
           </View>
-          <View style={styles.buttonWrapper}>
-            <View style={styles.button}>
-              <TouchableHighlight>
-                <Text>Start</Text>
-              </TouchableHighlight>
-            </View>
-            <View style={styles.button}>
-              <TouchableHighlight>
-                <Text>Start</Text>
-              </TouchableHighlight>
-            </View>
-            <View style={styles.button}>
-              <TouchableHighlight>
-                <Text>Start</Text>
-              </TouchableHighlight>
-            </View>
+          <View style={styles.scrollButton}>
+            <TouchableHighlight onPress={() => this.moveTo()}>
+              <Text style={styles.scrollButtonText}>Next</Text>
+            </TouchableHighlight>
           </View>
-        </SafeAreaView>
+        </View>
+
+        <View style={styles.buttonWrapper}>
+          <View style={styles.button}>
+            <TouchableHighlight>
+              <Text>Start</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
       </View>
     )
   }
 
   private setTimerValue = (scrollPosition: number): void => {
-    console.log('ScrollPosition', scrollPosition)
+    console.log('ScrollPosition', scrollPosition, this.scroll.current)
     // text width = 200 / 100 / 2 gives us index
     const index = scrollPosition / 100 / 2
     console.log('Index', index, this.state.times[index])
-    this.setState({ selectedTime: this.state.times[index] })
+    this.setState({
+      selectedTime: this.state.times[index],
+      selectedIndex: index
+    })
+  }
+
+  private moveTo = (whichWay?: string): void => {
+    console.log('WORKING')
+    // get current index * 100 * 2
+    let moveX = (this.state.selectedIndex + 1) * 2 * 100
+
+    if (whichWay === 'prev') {
+      if (this.state.selectedIndex === 0) {
+        moveX = 0
+      }
+      moveX = (this.state.selectedIndex - 1) * 2 * 100
+    }
+
+    console.log('Move X', moveX)
+    this.scroll.current!.scrollTo({
+      x: moveX,
+      animated: true
+    })
   }
 }
 
@@ -86,17 +114,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF'
+    backgroundColor: '#E4AC57'
   },
   scrollViewWrapper: {
     flex: 4,
-    width: 200
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   text: {
-    fontSize: 150
+    fontSize: 150,
+    color: 'white'
   },
   textWrapper: {
-    backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
     width: 200
@@ -107,6 +136,16 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    justifyContent: 'space-between'
+    alignItems: 'center'
+  },
+  scrollButton: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  scrollButtonText: {
+    color: 'white'
+  },
+  time: {
+    fontSize: 50
   }
 })
