@@ -9,13 +9,6 @@ import {
   TouchableHighlight
 } from 'react-native'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu'
-})
-
 interface Props {
   text: string
 }
@@ -24,52 +17,100 @@ interface State {
   times: number[]
   selectedTime?: number
   selectedIndex?: number
+  remainingTime?: number
+  timerRunning?: boolean
 }
 export default class App extends React.Component<Props, State> {
   private scroll = React.createRef()
+  private intervalHandler?: any
+  private secondsRemaining?: number
+
   public state = {
     times: [10, 15, 20, 25, 30, 45, 60],
-    selectedIndex: 0
+    selectedIndex: 0,
+    timerRunning: false
   }
 
+  tick = () => {
+    const sec = this.secondsRemaining
+    console.log('SECS', this.secondsRemaining)
+
+    this.setState({
+      remainingTime: this.secondsRemaining
+    })
+
+    // if (sec < 10) {
+    //   this.setState({
+    //     remainingTime: `0${this.state.remainingTime}`
+    //   })
+    // }
+
+    if (sec === 0) {
+      clearInterval(this.intervalHandler)
+      this.setState({
+        remainingTime: undefined,
+        timerRunning: false
+      })
+    }
+
+    this.secondsRemaining!--
+  }
+
+  startCountdown = () => {
+    this.secondsRemaining = this.state.times[this.state.selectedIndex]
+    console.log('SELECTED', this.secondsRemaining)
+    this.intervalHandler = setInterval(this.tick, 1000)
+    this.setState({ timerRunning: true })
+  }
   render() {
+    console.log(this.state)
     return (
       <View style={styles.container}>
-        <View style={styles.scrollViewWrapper}>
-          <View style={styles.scrollButton}>
-            <TouchableHighlight onPress={() => this.moveTo('prev')}>
-              <Text style={styles.scrollButtonText}>Prev</Text>
-            </TouchableHighlight>
+        {!this.state.timerRunning && (
+          <View style={styles.scrollViewWrapper}>
+            <View style={styles.scrollButton}>
+              <TouchableHighlight onPress={() => this.moveTo('prev')}>
+                <Text style={styles.scrollButtonText}>Prev</Text>
+              </TouchableHighlight>
+            </View>
+            <View style={{ width: 200 }}>
+              <ScrollView
+                ref={this.scroll}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                decelerationRate={0}
+                snapToAlignment={'center'}
+                snapToInterval={200}
+                onMomentumScrollEnd={e =>
+                  this.setTimerValue(e.nativeEvent.contentOffset.x)
+                }
+              >
+                {this.state.times.map(time => (
+                  <View key={time} style={styles.textWrapper}>
+                    <Text style={styles.text}>{time}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+            <View style={styles.scrollButton}>
+              <TouchableHighlight onPress={() => this.moveTo()}>
+                <Text style={styles.scrollButtonText}>Next</Text>
+              </TouchableHighlight>
+            </View>
           </View>
-          <View style={{ width: 200 }}>
-            <ScrollView
-              ref={this.scroll}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              decelerationRate={0}
-              snapToAlignment={'center'}
-              snapToInterval={200}
-              onMomentumScrollEnd={e =>
-                this.setTimerValue(e.nativeEvent.contentOffset.x)
-              }
-            >
-              {this.state.times.map(time => (
-                <View key={time} style={styles.textWrapper}>
-                  <Text style={styles.text}>{time}</Text>
-                </View>
-              ))}
-            </ScrollView>
+        )}
+
+        {this.state.timerRunning && (
+          <View style={styles.scrollViewWrapper}>
+            <View style={styles.textWrapper}>
+              <Text style={styles.text}>{this.state.remainingTime}</Text>
+            </View>
           </View>
-          <View style={styles.scrollButton}>
-            <TouchableHighlight onPress={() => this.moveTo()}>
-              <Text style={styles.scrollButtonText}>Next</Text>
-            </TouchableHighlight>
-          </View>
-        </View>
+        )}
 
         <View style={styles.buttonWrapper}>
           <View style={styles.button}>
-            <TouchableHighlight>
+            <TouchableHighlight onPress={this.startCountdown}>
               <Text>Start</Text>
             </TouchableHighlight>
           </View>
